@@ -1,0 +1,20 @@
+{
+  "name": "goose-game-kata",
+  "description": "https://github.com/xpeppers/goose-game-kata",
+  "version": "1.0.0",
+  "author": "Daniele Megna",
+  "license": "MIT",
+  "scripts": {
+    "test": "mocha",
+    "watch": "mocha --watch",
+    "bundle": "webpack index.js bundle.js",
+    "preserve": "yarn run bundle",
+    "serve": "http-server -p 8080 -c-1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "sinon": "^4.1.2",
+    "webpack": "^3.8.1"
+  }
+}

@@ -122,3 +122,15 @@ As a player, when I land on a space occupied by another player, I send him to my
    when the user writes: "move Pippo"
    the system responds: "Pippo rolls 1, 1. Pippo moves from 15 to 17. On 17 there is Pluto, who returns to 15"
    ```
+
+## Dev notes
+
+Docker dev-ready env:
+```
+$ docker run --rm -itv $PWD:/app -w /app -p 8080:8080 node:alpine sh
+/app # yarn install    # install dependencies
+/app # yarn test       # run node tests
+/app # yarn run watch  # watch on node tests
+/app # yarn run bundle # bundle webpack javascript file
+/app # yarn run serve  # serve html application
+```
