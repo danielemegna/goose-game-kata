@@ -1,16 +1,28 @@
-class ConsoleInput extends HTMLElement {
+class MyConsole extends HTMLElement {
   constructor() {
     super()
-    this.addEventListener('keypress', e => {
-      const key = e.which || e.keyCode
-      console.log('pressed ' + key)
-      if(key === 13)
-        alert('enter clicked')
-    })
   }
 
   connectedCallback() {
-    this.innerHTML = `<input type="text" style="width: 100%;font-size:18px;margin:0px 20px"></input>`
+    this.innerHTML = `
+      <style>
+        input, textarea { font-size:18px; width: 95% }
+      </style>
+
+      <textarea readonly rows="14"></textarea>
+      <input type="text"></input>
+    `
+
+    this.querySelector('input').addEventListener('keypress', this.onKeyPress)
   }
+
+  onKeyPress(e) {
+    const key = e.which || e.keyCode
+    if(key !== 13)
+      return
+
+    console.log('enter pressed')
+  }
+
 }
-customElements.define('console-input', ConsoleInput)
+customElements.define('my-console', MyConsole)
