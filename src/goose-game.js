@@ -3,13 +3,14 @@ function GooseGame() {
   this.playerRepository = new InMemoryPlayerRepository()
 
   this.sendCommand = function(commandString) {
-    var command = undefined
-    if(commandString.startsWith('move'))
-      command = new MovePlayerCommand(commandString, this.playerRepository)
-    else
-      command = new AddPlayerCommand(commandString, this.playerRepository)
+    return this.commandFor(commandString).run()
+  }
 
-    return command.run()
+  this.commandFor = (commandString, playerRepository) => {
+    if(commandString.startsWith('move'))
+      return new MovePlayerCommand(commandString, this.playerRepository)
+
+    return new AddPlayerCommand(commandString, this.playerRepository)
   }
 
 
