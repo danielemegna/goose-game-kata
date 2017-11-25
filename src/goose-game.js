@@ -2,11 +2,13 @@ function GooseGame() {
 
   this.playerRepository = new InMemoryPlayerRepository()
 
-  this.sendCommand = function(command) {
-    if(command.startsWith('move'))
-      return this.movePlayerCommand(command)
+  this.sendCommand = function(commandString) {
+    if(commandString.startsWith('move'))
+      return this.movePlayerCommand(commandString)
 
-    return this.addPlayerCommand(command)
+    const command = new AddPlayerCommand(commandString, this.playerRepository)
+
+    return command.run()
   }
 
   this.movePlayerCommand = function(command) {
@@ -27,20 +29,22 @@ function GooseGame() {
       `to ${newPlayerPosition}`
   }
 
-  this.addPlayerCommand = function(command) {
+}
+
+function AddPlayerCommand(command, playerRepository) {
+  this.run = () => {
     const newPlayer = extractPlayerFrom(command)
 
-    if(this.playerRepository.isStored(newPlayer))
+    if(playerRepository.isStored(newPlayer))
       return newPlayer + ': already existing player'
 
-    this.playerRepository.store(newPlayer)
-    return this.playerRepository.storedToString()
+    playerRepository.store(newPlayer)
+    return playerRepository.storedToString()
   }
 
   function extractPlayerFrom(command) {
     return /add player ([a-zA-Z]+)/.exec(command)[1]
   }
-
 }
 
 function InMemoryPlayerRepository() {
