@@ -3,15 +3,20 @@ function GooseGame() {
   this.playerRepository = new InMemoryPlayerRepository()
 
   this.sendCommand = function(commandString) {
+    var command = undefined
     if(commandString.startsWith('move'))
-      return this.movePlayerCommand(commandString)
-
-    const command = new AddPlayerCommand(commandString, this.playerRepository)
+      command = new MovePlayerCommand(commandString, this.playerRepository)
+    else
+      command = new AddPlayerCommand(commandString, this.playerRepository)
 
     return command.run()
   }
 
-  this.movePlayerCommand = function(command) {
+
+}
+
+function MovePlayerCommand(command, playerRepository) {
+  this.run = () => {
     const parsed = /move ([a-zA-Z]+) ([1-6]{1}), ([1-6]{1})/.exec(command)
     
     const playerName = parsed[1]
@@ -19,16 +24,15 @@ function GooseGame() {
     const secondRoll = parseInt(parsed[3])
     const rollsSum = firstRoll + secondRoll
 
-    const oldPlayerPosition = this.playerRepository.getPositionFor(playerName)
+    const oldPlayerPosition = playerRepository.getPositionFor(playerName)
     const newPlayerPosition = oldPlayerPosition + rollsSum
-    this.playerRepository.updatePosition(playerName, newPlayerPosition)
+    playerRepository.updatePosition(playerName, newPlayerPosition)
 
     return `${playerName} rolls ${firstRoll}, ${secondRoll}. ` +
       `${playerName} moves ` +
       `from ${oldPlayerPosition == 0 ? 'Start' : oldPlayerPosition} ` +
       `to ${newPlayerPosition}`
   }
-
 }
 
 function AddPlayerCommand(command, playerRepository) {
