@@ -16,12 +16,14 @@ function GooseGame() {
     const firstRoll = parseInt(parsed[2])
     const secondRoll = parseInt(parsed[3])
     const rollsSum = firstRoll + secondRoll
-    const playerPosition = 0
-    const newPlayerPosition = playerPosition + rollsSum
+
+    const oldPlayerPosition = this.playerRepository.getPositionFor(playerName)
+    const newPlayerPosition = oldPlayerPosition + rollsSum
+    this.playerRepository.updatePosition(playerName, newPlayerPosition)
 
     return `${playerName} rolls ${firstRoll}, ${secondRoll}. ` +
       `${playerName} moves ` +
-      `from ${playerPosition == 0 ? 'Start' : playerPosition} ` +
+      `from ${oldPlayerPosition == 0 ? 'Start' : oldPlayerPosition} ` +
       `to ${newPlayerPosition}`
   }
 
@@ -42,19 +44,32 @@ function GooseGame() {
 }
 
 function InMemoryPlayerRepository() {
-  this.players = []
+  this.positions = []
 
   this.store = (playerName) => {
-    this.players.push(playerName)
+    this.positions[playerName] = 0
   }
 
   this.isStored = (playerName) => {
-    return this.players.indexOf(playerName) >= 0
+    return playerName in this.positions
   }
 
   this.storedToString = () => {
-    return 'players: ' + this.players.join(', ')
+    return 'players: ' + this.getNames().join(', ')
   }
+
+  this.getPositionFor = (playerName) => {
+    return this.positions[playerName]
+  }
+
+  this.updatePosition = (playerName, position) => {
+    this.positions[playerName] = position
+  }
+
+  this.getNames = () => {
+    return Object.keys(this.positions)
+  }
+
 }
 
 module.exports = GooseGame

@@ -47,7 +47,11 @@ describe('GooseGame', () => {
 
       response = game.sendCommand('move Pluto 2, 2')
       expect(response).to.be.eq('Pluto rolls 2, 2. Pluto moves from Start to 4')
+
+      response = game.sendCommand('move Pippo 2, 3')
+      expect(response).to.be.eq('Pippo rolls 2, 3. Pippo moves from 6 to 11')
     })
+
   })
 
 })
