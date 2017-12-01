@@ -28,18 +28,27 @@ function MovePlayerCommand(command, playerRepository) {
     const rollsSum = firstRoll + secondRoll
 
     const oldPlayerPosition = playerRepository.getPositionFor(playerName)
-    const newPlayerPosition = oldPlayerPosition + rollsSum
+    var newPlayerPosition = oldPlayerPosition + rollsSum
+
+    const isABounce = (newPlayerPosition > WIN_POSITION)
+    if(isABounce)
+      newPlayerPosition -= 2*(newPlayerPosition - WIN_POSITION)
+
     playerRepository.updatePosition(playerName, newPlayerPosition)
 
-    return buildResponseMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition)
+    return buildResponseMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition, isABounce)
   }
 
-  function buildResponseMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition) {
-    var responseMessage = moveMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition)
-    if(newPlayerPosition == WIN_POSITION)
-      responseMessage += `. ` + winMessage(playerName) 
+  function buildResponseMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition, isABounce) {
+    const isAWinner = (newPlayerPosition == WIN_POSITION)
+    const moveResponseMessage = moveMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, isABounce ? WIN_POSITION : newPlayerPosition)
 
-    return responseMessage
+    if(isABounce)
+      return moveResponseMessage + `. ` + bounceMessage(playerName, newPlayerPosition) 
+    if(isAWinner)
+      return moveResponseMessage + `. ` + winMessage(playerName) 
+
+    return moveResponseMessage
   }
 
   function moveMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition) {
@@ -47,6 +56,10 @@ function MovePlayerCommand(command, playerRepository) {
       `${playerName} moves ` +
       `from ${oldPlayerPosition == 0 ? 'Start' : oldPlayerPosition} ` +
       `to ${newPlayerPosition}`
+  }
+
+  function bounceMessage(playerName, newPlayerPosition) {
+    return `${playerName} bounces! ${playerName} returns to ${newPlayerPosition}`
   }
 
   function winMessage(playerName) {

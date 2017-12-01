@@ -67,6 +67,11 @@ describe('GooseGame', () => {
         expect(response).to.be.eq('Pippo rolls 1, 2. Pippo moves from 60 to 63. Pippo Wins!!')
       })
 
+      it('with a move "Pippo 3, 2" the system should recognize the bounce', () => {
+        const response = game.sendCommand('move Pippo 3, 2')
+        expect(response).to.be.eq('Pippo rolls 3, 2. Pippo moves from 60 to 63. Pippo bounces! Pippo returns to 61')
+      })
+
     })
 
   })
