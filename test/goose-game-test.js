@@ -11,21 +11,21 @@ describe('GooseGame', () => {
     game = new GooseGame()
   })
   
-  describe('add player feature', () => {
+  describe('with no participant', () => {
 
-    it('If there is no participant', () => {
+    it('add a player', () => {
       const response = game.sendCommand('add player Pippo')
       expect(response).to.be.eq('players: Pippo')
     })
 
-    it('Adding two participants', () => {
+    it('add two players', () => {
       game.sendCommand('add player Pippo')
       const response = game.sendCommand('add player Pluto')
 
       expect(response).to.be.eq('players: Pippo, Pluto')
     })
 
-    it('If there is already a participant', () => {
+    it('add a player twice', () => {
       game.sendCommand('add player Pippo')
       const response = game.sendCommand('add player Pippo')
 
@@ -34,7 +34,7 @@ describe('GooseGame', () => {
     
   })
 
-  describe('move player feature', () => {
+  describe('with two player Pippo and Pluto added', () => {
     
     beforeEach(() => {
       game.sendCommand('add player Pippo')
