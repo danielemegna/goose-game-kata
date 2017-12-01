@@ -17,9 +17,11 @@ function GooseGame() {
 }
 
 function MovePlayerCommand(command, playerRepository) {
+
+  const WIN_POSITION = 63
+
   this.run = () => {
     const parsed = /move ([a-zA-Z]+) ([1-6]{1}), ([1-6]{1})/.exec(command)
-    
     const playerName = parsed[1]
     const firstRoll = parseInt(parsed[2])
     const secondRoll = parseInt(parsed[3])
@@ -29,10 +31,26 @@ function MovePlayerCommand(command, playerRepository) {
     const newPlayerPosition = oldPlayerPosition + rollsSum
     playerRepository.updatePosition(playerName, newPlayerPosition)
 
+    return buildResponseMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition)
+  }
+
+  function buildResponseMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition) {
+    var responseMessage = moveMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition)
+    if(newPlayerPosition == WIN_POSITION)
+      responseMessage += `. ` + winMessage(playerName) 
+
+    return responseMessage
+  }
+
+  function moveMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition) {
     return `${playerName} rolls ${firstRoll}, ${secondRoll}. ` +
       `${playerName} moves ` +
       `from ${oldPlayerPosition == 0 ? 'Start' : oldPlayerPosition} ` +
       `to ${newPlayerPosition}`
+  }
+
+  function winMessage(playerName) {
+    return `${playerName} Wins!!`
   }
 }
 
