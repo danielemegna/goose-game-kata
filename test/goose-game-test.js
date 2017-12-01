@@ -52,6 +52,23 @@ describe('GooseGame', () => {
       expect(response).to.be.eq('Pippo rolls 2, 3. Pippo moves from 6 to 11')
     })
 
+    describe('if there is one participant "Pippo" on space "60"', () => {
+
+      beforeEach(() => {
+        const bestRolls = 6+6
+        for(var i=0; i<(60/bestRolls); i++) {
+          game.sendCommand('move Pippo 6, 6')
+          game.sendCommand('move Pluto 1, 1')
+        }
+      })
+
+      xit('with a move "Pippo 1, 2" the system should recognize Pippo victory', () => {
+        const response = game.sendCommand('move Pippo 1, 2')
+        expect(response).to.be.eq('Pippo rolls 1, 2. Pippo moves from 60 to 63. Pippo Wins!!')
+      })
+
+    })
+
   })
 
 })
