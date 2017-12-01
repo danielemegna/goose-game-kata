@@ -44,7 +44,7 @@ function AddPlayerCommand(command, playerRepository) {
       return newPlayer + ': already existing player'
 
     playerRepository.store(newPlayer)
-    return playerRepository.storedToString()
+    return playerRepository.allToString()
   }
 
   function extractPlayerFrom(command) {
@@ -63,7 +63,7 @@ function InMemoryPlayerRepository() {
     return playerName in this.positions
   }
 
-  this.storedToString = () => {
+  this.allToString = () => {
     return 'players: ' + this.getNames().join(', ')
   }
 
