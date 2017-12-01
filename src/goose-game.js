@@ -30,32 +30,42 @@ function MovePlayerCommand(command, playerRepository) {
     const oldPlayerPosition = playerRepository.getPositionFor(playerName)
     var newPlayerPosition = oldPlayerPosition + rollsSum
 
-    const isABounce = (newPlayerPosition > WIN_POSITION)
-    if(isABounce)
-      newPlayerPosition -= 2*(newPlayerPosition - WIN_POSITION)
+    const moveEvent = {
+      playerName: playerName,
+      firstRoll: firstRoll,
+      secondRoll: secondRoll,
+      oldPlayerPosition: oldPlayerPosition,
+      newPlayerPosition: newPlayerPosition,
+      isABounce: newPlayerPosition > WIN_POSITION,
+      isAWinner: newPlayerPosition == WIN_POSITION
+    }
 
-    playerRepository.updatePosition(playerName, newPlayerPosition)
+    if(moveEvent.isABounce)
+      moveEvent.newPlayerPosition -= 2*(moveEvent.newPlayerPosition - WIN_POSITION)
 
-    return buildResponseMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition, isABounce)
+    playerRepository.updatePosition(moveEvent.playerName, moveEvent.newPlayerPosition)
+
+    return buildResponseMessage(moveEvent)
   }
 
-  function buildResponseMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition, isABounce) {
-    const isAWinner = (newPlayerPosition == WIN_POSITION)
-    const moveResponseMessage = moveMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, isABounce ? WIN_POSITION : newPlayerPosition)
+  function buildResponseMessage(moveEvent) {
+    const moveResponseMessage = moveMessage(moveEvent)
 
-    if(isABounce)
-      return moveResponseMessage + `. ` + bounceMessage(playerName, newPlayerPosition) 
-    if(isAWinner)
-      return moveResponseMessage + `. ` + winMessage(playerName) 
+    if(moveEvent.isABounce)
+      return moveResponseMessage + `. ` + bounceMessage(moveEvent.playerName, moveEvent.newPlayerPosition) 
+    if(moveEvent.isAWinner)
+      return moveResponseMessage + `. ` + winMessage(moveEvent.playerName) 
 
     return moveResponseMessage
   }
 
-  function moveMessage(playerName, firstRoll, secondRoll, oldPlayerPosition, newPlayerPosition) {
-    return `${playerName} rolls ${firstRoll}, ${secondRoll}. ` +
-      `${playerName} moves ` +
-      `from ${oldPlayerPosition == 0 ? 'Start' : oldPlayerPosition} ` +
-      `to ${newPlayerPosition}`
+  function moveMessage(moveEvent) {
+    const oldPlayerPositionString = (moveEvent.oldPlayerPosition == 0 ? 'Start' : moveEvent.oldPlayerPosition)
+    const newPlayerPositionString = moveEvent.isABounce ? WIN_POSITION : moveEvent.newPlayerPosition
+    return `${moveEvent.playerName} rolls ${moveEvent.firstRoll}, ${moveEvent.secondRoll}. ` +
+      `${moveEvent.playerName} moves ` +
+      `from ${oldPlayerPositionString} ` +
+      `to ${newPlayerPositionString}`
   }
 
   function bounceMessage(playerName, newPlayerPosition) {
