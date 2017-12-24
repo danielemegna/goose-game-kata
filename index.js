@@ -9,19 +9,39 @@ class MyConsole extends HTMLElement {
         input, textarea { font-size:18px; width: 95% }
       </style>
 
-      <textarea readonly rows="14"></textarea>
+      <textarea readonly rows="14">> Hello!</textarea>
       <input type="text"></input>
     `
 
-    this.querySelector('input').addEventListener('keypress', this.onKeyPress)
+    const inputElement = this.querySelector('input')
+    const outputArea = this.querySelector('textarea')
+
+    inputElement.addEventListener('keypress', this.onInputKeyPress(outputArea))
   }
 
-  onKeyPress(e) {
-    const key = e.which || e.keyCode
-    if(key !== 13)
-      return
+  onInputKeyPress(outputArea) {
+    return (e) => {
+      if(!this.isEnterPressure(e)) return
 
-    console.log('enter pressed')
+      const command = this.extractAndClearInput(e)
+      this.writeOutput(command, outputArea)
+    }
+  }
+
+  isEnterPressure(e) {
+    const key = e.which || e.keyCode
+    return key === 13
+  }
+
+  extractAndClearInput(e) {
+    const input = e.srcElement.value
+    e.srcElement.value = ''
+    return input
+  }
+
+  writeOutput(command, outputArea) {
+    outputArea.textContent += "\n> " + command
+    outputArea.scrollTop = outputArea.scrollHeight;
   }
 
 }
