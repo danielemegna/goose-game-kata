@@ -1,5 +1,5 @@
-function GooseGame() {
-
+function GooseGame(dice) {
+  this.dice = dice
   this.playerRepository = new InMemoryPlayerRepository()
 
   this.sendCommand = function(commandString) {
@@ -8,25 +8,22 @@ function GooseGame() {
 
   this.commandFor = (commandString, playerRepository) => {
     if(commandString.startsWith('move'))
-      return new MovePlayerCommand(commandString, this.playerRepository)
+      return new MovePlayerCommand(commandString, this.playerRepository, this.dice)
 
     return new AddPlayerCommand(commandString, this.playerRepository)
   }
 
-
 }
 
-function MovePlayerCommand(command, playerRepository) {
+function MovePlayerCommand(command, playerRepository, dice) {
 
   const WIN_POSITION = 63
 
   this.run = () => {
-    const parsed = /move ([a-zA-Z]+) ([1-6]{1}), ([1-6]{1})/.exec(command)
-    const playerName = parsed[1]
-    const firstRoll = parseInt(parsed[2])
-    const secondRoll = parseInt(parsed[3])
-    const rollsSum = firstRoll + secondRoll
+    const playerName = parsePlayerName(command) 
+    const [firstRoll, secondRoll] = parseOrGenerateRolls(command, dice)
 
+    const rollsSum = firstRoll + secondRoll
     const oldPlayerPosition = playerRepository.getPositionFor(playerName)
     var newPlayerPosition = oldPlayerPosition + rollsSum
 
@@ -44,8 +41,19 @@ function MovePlayerCommand(command, playerRepository) {
       moveEvent.newPlayerPosition -= 2*(moveEvent.newPlayerPosition - WIN_POSITION)
 
     playerRepository.updatePosition(moveEvent.playerName, moveEvent.newPlayerPosition)
-
     return buildResponseMessage(moveEvent)
+  }
+
+  function parsePlayerName(command) {
+    return /move ([a-zA-Z]+)/.exec(command)[1]
+  }
+
+  function parseOrGenerateRolls(command, dice) {
+    const parsedRolls = /move [a-zA-Z]+ ([1-6]{1}), ([1-6]{1})/.exec(command)
+    if(parsedRolls != null)
+      return [parseInt(parsedRolls[1]), parseInt(parsedRolls[2])]
+
+    return dice.roll()
   }
 
   function buildResponseMessage(moveEvent) {
@@ -61,7 +69,7 @@ function MovePlayerCommand(command, playerRepository) {
 
   function moveMessage(moveEvent) {
     const oldPlayerPositionString = (moveEvent.oldPlayerPosition == 0 ? 'Start' : moveEvent.oldPlayerPosition)
-    const newPlayerPositionString = moveEvent.isABounce ? WIN_POSITION : moveEvent.newPlayerPosition
+    const newPlayerPositionString = (moveEvent.isABounce ? WIN_POSITION : moveEvent.newPlayerPosition)
     return `${moveEvent.playerName} rolls ${moveEvent.firstRoll}, ${moveEvent.secondRoll}. ` +
       `${moveEvent.playerName} moves ` +
       `from ${oldPlayerPositionString} ` +

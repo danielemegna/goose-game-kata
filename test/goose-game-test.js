@@ -3,12 +3,14 @@ const
   sinon = require('sinon')
   expect = chai.expect
   GooseGame = require('../src/goose-game')
+  LoadedDice = require('../src/dice/loaded-dice')
 
 describe('GooseGame', () => {
 
-  var game = null
+  var game = null, loadedDice = null
   beforeEach(() => {
-    game = new GooseGame()
+    loadedDice = new LoadedDice()
+    game = new GooseGame(loadedDice)
   })
   
   describe('with no participant', () => {
@@ -72,6 +74,19 @@ describe('GooseGame', () => {
         expect(response).to.be.eq('Pippo rolls 3, 2. Pippo moves from 60 to 63. Pippo bounces! Pippo returns to 61')
       })
 
+    })
+
+    describe('if there is one participant "Pippo" on space "4"', () => {
+      beforeEach(() => {
+        game.sendCommand('move Pippo 3, 1')
+        game.sendCommand('move Pluto 1, 1')
+      })
+
+      it('let the game throws the dice for me to save effort', () => {
+        loadedDice.setNext(1, 2)
+        var response = game.sendCommand('move Pippo')
+        expect(response).to.be.eq('Pippo rolls 1, 2. Pippo moves from 4 to 7')
+      })
     })
 
   })
