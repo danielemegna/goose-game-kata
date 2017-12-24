@@ -1,8 +1,12 @@
-function MovePlayerCommand(command, playerRepository, dice) {
+function MovePlayerCommand(playerRepository, dice) {
 
   const WIN_POSITION = 63
 
-  this.run = () => {
+  this.canHandle = (command) => {
+    return /move ([a-zA-Z]+)/.exec(command)
+  }
+
+  this.run = (command) => {
     const playerName = parsePlayerName(command) 
     const [firstRoll, secondRoll] = parseOrGenerateRolls(command, dice)
 

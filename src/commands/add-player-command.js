@@ -1,5 +1,10 @@
-function AddPlayerCommand(command, playerRepository) {
-  this.run = () => {
+function AddPlayerCommand(playerRepository) {
+
+  this.canHandle = (command) => {
+    return /add player ([a-zA-Z]+)/.exec(command)
+  }
+
+  this.run = (command) => {
     const newPlayer = extractPlayerFrom(command)
 
     if(playerRepository.isStored(newPlayer))

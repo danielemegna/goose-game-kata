@@ -3,18 +3,16 @@ const AddPlayerCommand = require('./commands/add-player-command')
 const InMemoryPlayerRepository = require('./repositories/memory-player-repository')
 
 function GooseGame(dice) {
-  this.dice = dice
   this.playerRepository = new InMemoryPlayerRepository()
+  this.commands = [
+    new MovePlayerCommand(this.playerRepository, dice),
+    new AddPlayerCommand(this.playerRepository)
+  ]
 
   this.sendCommand = function(commandString) {
-    return this.commandFor(commandString).run()
-  }
-
-  this.commandFor = (commandString, playerRepository) => {
-    if(commandString.startsWith('move'))
-      return new MovePlayerCommand(commandString, this.playerRepository, this.dice)
-
-    return new AddPlayerCommand(commandString, this.playerRepository)
+    return this.commands
+      .find((command) => command.canHandle(commandString))
+      .run(commandString)
   }
 
 }
