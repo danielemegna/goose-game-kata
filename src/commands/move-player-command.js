@@ -21,11 +21,14 @@ function MovePlayerCommand(playerRepository, dice) {
       oldPlayerPosition: oldPlayerPosition,
       newPlayerPosition: newPlayerPosition,
       isABounce: newPlayerPosition > WIN_POSITION,
+      isABridge: newPlayerPosition == 6,
       isAWinner: newPlayerPosition == WIN_POSITION
     }
 
     if(moveEvent.isABounce)
       moveEvent.newPlayerPosition -= 2*(moveEvent.newPlayerPosition - WIN_POSITION)
+    if(moveEvent.isABridge)
+      moveEvent.newPlayerPosition = 12
 
     playerRepository.updatePosition(moveEvent.playerName, moveEvent.newPlayerPosition)
     return buildResponseMessage(moveEvent)
@@ -48,6 +51,8 @@ function MovePlayerCommand(playerRepository, dice) {
 
     if(moveEvent.isABounce)
       return moveResponseMessage + `. ` + bounceMessage(moveEvent.playerName, moveEvent.newPlayerPosition) 
+    if(moveEvent.isABridge)
+      return moveResponseMessage + `. ` + jumpMessage(moveEvent.playerName, moveEvent.newPlayerPosition) 
     if(moveEvent.isAWinner)
       return moveResponseMessage + `. ` + winMessage(moveEvent.playerName) 
 
@@ -56,7 +61,13 @@ function MovePlayerCommand(playerRepository, dice) {
 
   function moveMessage(moveEvent) {
     const oldPlayerPositionString = (moveEvent.oldPlayerPosition == 0 ? 'Start' : moveEvent.oldPlayerPosition)
-    const newPlayerPositionString = (moveEvent.isABounce ? WIN_POSITION : moveEvent.newPlayerPosition)
+
+    var newPlayerPositionString = moveEvent.newPlayerPosition
+    if(moveEvent.isABounce)
+      newPlayerPositionString = WIN_POSITION
+    if(moveEvent.isABridge)
+      newPlayerPositionString = "The Bridge"
+
     return `${moveEvent.playerName} rolls ${moveEvent.firstRoll}, ${moveEvent.secondRoll}. ` +
       `${moveEvent.playerName} moves ` +
       `from ${oldPlayerPositionString} ` +
@@ -65,6 +76,10 @@ function MovePlayerCommand(playerRepository, dice) {
 
   function bounceMessage(playerName, newPlayerPosition) {
     return `${playerName} bounces! ${playerName} returns to ${newPlayerPosition}`
+  }
+
+  function jumpMessage(playerName, newPlayerPosition) {
+    return `${playerName} jumps to ${newPlayerPosition}`
   }
 
   function winMessage(playerName) {
